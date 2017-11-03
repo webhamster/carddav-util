@@ -107,7 +107,7 @@ def upload( url, filename, user, passwd, auth, verify ):
     print '[i] Processing cards in', filename, '...'
     f = open( filename, 'r' )
     cards = []
-    for card in vobject.readComponents( f, validate=True ):
+    for card in vobject.readComponents( f, validate=False ):
         cards.append( card )
     nCards = len(cards)
     print '[i] Successfuly read and validated', nCards, 'entries'
@@ -128,6 +128,11 @@ def upload( url, filename, user, passwd, auth, verify ):
         if not hasattr( card, 'uid' ):
             card.add('uid')
         card.uid.value = str( uuid.uuid4() )
+        
+        if not hasattr(card, 'fn' ):
+            card.add('fn')
+            card.fn.value = card.email.value
+        
         try:
             dav.upload_new_card( card.serialize().decode('utf-8') )
         except Exception, e:
